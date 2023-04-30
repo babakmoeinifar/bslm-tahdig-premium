@@ -25,24 +25,14 @@ class LunchController extends Controller
             ->where('booking_date', '>', Carbon::now()->addHours(config('salam.gap_hours')))
             ->orderBy('booking_date', 'asc')->get();
 
-        $daysOfWeek = [
-            'Saturday' => 'شنبه',
-            'Sunday' => 'یکشنبه',
-            'Monday' => 'دوشنبه',
-            'Tuesday' => 'سشنبه',
-            'Wednesday' => 'چهارشنبه',
-            'Thursday' => 'پنجشنبه',
-            'Friday' => 'جمعه',
-        ];
+       $data = [];
         foreach ($bookings as $booking) {
             $dayOfWeek = Carbon::parse($booking->booking_date)->format('l');
-//            $dayOfWeekPersian = $daysOfWeek[$dayOfWeek];
             if (!isset($data[$dayOfWeek])) {
                 $data[$dayOfWeek] = [];
             }
 
             $data[$dayOfWeek][] = $booking;
-//            $data[$dayOfWeekPersian][] = $booking;
         }
 
         $is_temporary_disabled = (int)OptionController::get('disable-tahdig') === 1;
