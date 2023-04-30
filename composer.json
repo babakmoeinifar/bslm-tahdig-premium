@@ -1,0 +1,25 @@
+{
+    "name": "bslm/tahdig-premium",
+    "description": "Basalamiha tahdig premium",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "Bslm\\Tahdig\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "babakMoeinifar",
+            "email": "babakus7@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Bslm\\Tahdig\\TahdigServiceProvider"
+            ]
+        }
+    },
+    "require": {}
+}
