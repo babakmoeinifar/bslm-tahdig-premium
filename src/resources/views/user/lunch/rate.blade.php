@@ -1,4 +1,4 @@
-@extends('resources.views.template.master-user')
+@extends('template.master-user')
 
 @section('title', 'امتیاز غذا')
 
