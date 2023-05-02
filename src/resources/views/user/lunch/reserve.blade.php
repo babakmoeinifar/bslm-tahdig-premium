@@ -59,12 +59,12 @@
                             <h5 class="pt-3">{{ jdfw($bookings[0]->booking_date) }}</h5>
                             <div class="row row-cols-1 row-cols-md-3 mt-4">
                                 @foreach($bookings as $booking)
-                                    <div class="col mb-4 border rounded">
-                                        <div class="card h-100">
+                                    <div class="col mb-4">
+                                        <div class="card h-100 border rounded">
                                             @if($bookings[0]->booking_date != $booking->booking_date)
                                                 <h6 class="pt-3">{{ jdfw($booking->booking_date) }}</h6>
                                             @endif
-                                            <div class="card-body">
+                                            <div class="card-body mb-0 pb-0">
                                                 <h4 class="card-title ss02 mb-3"
                                                     style="font-size: 1.4rem">{{ $booking->meal->name }}</h4>
                                                 <div class="card-text">
@@ -74,12 +74,13 @@
                                                                 $value = $booking->reservationsForUser()->where('food_id', $food->id)->first();
                                                             @endphp
 
-                                                            <div class="d-flex" style="align-items: baseline">
-                                                                <h6 class="mt-2"
+                                                            <div class="d-flex row" style="align-items: baseline">
+                                                                <h6 class="mt-2 col-auto"
                                                                     style="@if(isset($value->quantity) && $value->quantity > 0) color:#ff4501;font-weight:900; @else font-weight: 500 @endif"
                                                                     id="foodName-{{ $booking->id }}{{ $food->id }}">{{ $food->name }}
                                                                 </h6>
-                                                                <small class="mx-2 text-muted">/ {{ $food->restaurant->name }}</small>
+                                                                <small class="mx-2 text-muted col-auto">/ {{ $food->restaurant->name }}</small>
+
                                                             </div>
                                                             <div class="row">
 
@@ -103,12 +104,12 @@
                                                 </div>
                                             </div>
                                             <div class="card-footer">
-                                                <div class="form-group row m-0 mt-2">
-                                                    <label for="quantity" class="col-sm-4 col-form-label"
+                                                <div class="d-flex justify-content-center m-0">
+                                                    <label for="quantity" class="col-sm-3 col-form-label"
                                                            style="font-weight: 400;font-size: 13px">ساختمان</label>
-                                                    <div class="col-sm-8">
+                                                    <div class="col-sm-4">
                                                         <select class="form-control form-select" id="salonId-{{$booking->id}}"
-                                                                name="salon[{{ $booking->id }}]">
+                                                                name="salon[{{ $booking->id }}]" style="font-size: 12px">
                                                             <option value="1">---</option>
                                                             @foreach($salons as $salon)
                                                                 <option value="{{ $salon->id }}"
@@ -160,6 +161,28 @@
             width: 100%;
             background-color: white;
         }
+        .btn-decrement{
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            color: #495057;
+            background-color: #e9ecef;
+            border-right: 0;
+        }
+        .btn-increment{
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            color: #495057;
+            background-color: #e9ecef;
+            border-left: 0;
+        }
+        .swal2-popup{
+            width: 11.2em !important;
+            font-size: 0.5rem !important;
+        }
 
     </style>
 @endpush
@@ -202,7 +225,7 @@
                             timer: 1500
                         })
                     }
-            })
+                })
                 .catch(function (error) {
                     console.log(error);
                     Swal.fire({
