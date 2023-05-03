@@ -34,8 +34,8 @@
 
         <form action="{{ url('lunch/reserve') }}" method="post">
             @csrf
-            <div class="card mt-3 border rounded">
-                <nav class="card-header">
+            <div class="mt-3 rounded">
+                <nav>
                     <ul class="nav nav-tabs border-bottom">
                         @foreach($data as $dayOfWeek => $bookings)
                             @php $dayOfWeekPersian = $daysOfWeek[$dayOfWeek]; @endphp
@@ -198,7 +198,9 @@
         function updateFoodValue(foodId, elementId, qty, bookingId) {
             let inputValue = $('#' + elementId).val();
             let salonId = $('#salonId-' + bookingId ).val();
-
+            if (inputValue < 1){
+                $('.btn-decrement').addClass('disable');
+            }
             fetch('/lunch/reserve', {
                 headers: {
                     "Content-Type": "application/json",
