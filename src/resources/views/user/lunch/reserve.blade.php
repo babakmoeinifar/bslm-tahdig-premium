@@ -76,7 +76,7 @@
 
                                                             <div class="d-flex row" style="align-items: baseline">
                                                                 <h6 class="mt-2 col-auto"
-                                                                    style="@if(isset($value->quantity) && $value->quantity > 0) color:#ff4501;font-weight:900; @else font-weight: 500 @endif"
+                                                                    style="@if(isset($value->quantity) && $value->quantity > 0) color:#ff4501;font-weight:900; @else font-weight: 500 @endif line-height:inherit"
                                                                     id="foodName-{{ $booking->id }}{{ $food->id }}">{{ $food->name }}
                                                                 </h6>
                                                                 <small class="mx-2 text-muted col-auto">/ {{ $food->restaurant->name }}</small>
@@ -183,6 +183,10 @@
             width: 11.2em !important;
             font-size: 0.5rem !important;
         }
+        .swal2-container.swal2-backdrop-show, .swal2-container.swal2-noanimation {
+            background: none !important;
+            box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+        }
 
     </style>
 @endpush
@@ -194,6 +198,9 @@
         function updateFoodValue(foodId, elementId, qty, bookingId) {
             let inputValue = $('#' + elementId).val();
             let salonId = $('#salonId-' + bookingId ).val();
+            if (inputValue < 1){
+                $('.btn-decrement').addClass('disable');
+            }
             fetch('/lunch/reserve', {
                 headers: {
                     "Content-Type": "application/json",
@@ -222,7 +229,7 @@
                             icon: 'success',
                             title: '',
                             showConfirmButton: false,
-                            timer: 1500
+                            timer: 1000
                         })
                     }
                 })
@@ -233,7 +240,7 @@
                         icon: 'error',
                         title: '',
                         showConfirmButton: false,
-                        timer: 1500
+                        timer: 1000
                     })
                 });
         }
