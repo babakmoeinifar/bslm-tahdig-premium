@@ -198,9 +198,7 @@
         function updateFoodValue(foodId, elementId, qty, bookingId) {
             let inputValue = $('#' + elementId).val();
             let salonId = $('#salonId-' + bookingId ).val();
-            if (inputValue < 1){
-                $('.btn-decrement').addClass('disable');
-            }
+
             fetch('/lunch/reserve', {
                 headers: {
                     "Content-Type": "application/json",
