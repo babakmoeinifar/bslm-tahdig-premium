@@ -35,6 +35,12 @@ Route::group(['prefix' => 'admin/lunch', 'middleware' => 'web', 'namespace' => '
             Route::get('/comments/{restaurant}', [C\LunchController::class, 'restaurantComments'])->where('id', '[0-9]+');
         });
 
+
+    });
+});
+Route::group(['prefix' => 'admin', 'middleware' => 'web', 'namespace' => 'Bslm\Tahdig\Http\Controllers\Admin'], function () {
+    Route::group(['middleware' => 'auth'], function () {
+
         Route::group(['prefix' => 'bills'], function () {
             Route::get('/lunch-users', [C\BillController::class, 'lunchUsers']);
             Route::get('/lunch-users-export', [C\BillController::class, 'lunchUserExport']);
