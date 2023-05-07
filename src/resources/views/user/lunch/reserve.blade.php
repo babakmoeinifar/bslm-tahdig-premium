@@ -182,6 +182,7 @@
         .swal2-popup{
             width: 11.2em !important;
             font-size: 0.5rem !important;
+            z-index: 999;
         }
         .swal2-container.swal2-backdrop-show, .swal2-container.swal2-noanimation {
             background: none !important;
