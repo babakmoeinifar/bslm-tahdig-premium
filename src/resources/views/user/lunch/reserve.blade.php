@@ -109,7 +109,7 @@
                                                            style="font-weight: 400;font-size: 13px">ساختمان</label>
                                                     <div class="col-sm-4">
                                                         <select class="form-control form-select" id="salonId-{{$booking->id}}"
-                                                                name="salon[{{ $booking->id }}]" style="font-size: 12px">
+                                                                name="salon[{{ $booking->id }}]" style="font-size: 12px" onchange="salonChanged({{$booking->id}})">
                                                             <option value="1">---</option>
                                                             @foreach($salons as $salon)
                                                                 <option value="{{ $salon->id }}"
@@ -223,6 +223,46 @@
                         }else {
                             $('#foodName-' + elementId).css({"color": "", "font-weight": "500"})
                         }
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'success',
+                            title: '',
+                            showConfirmButton: false,
+                            timer: 1000
+                        })
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                    Swal.fire({
+                        position: 'top-end',
+                        icon: 'error',
+                        title: '',
+                        showConfirmButton: false,
+                        timer: 1000
+                    })
+                });
+        }
+
+        function salonChanged(bookingId){
+            let salonId = $('#salonId-' + bookingId ).val();
+
+            fetch('/lunch/reserve/changeSalon', {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json, text-plain, */*",
+                    "X-Requested-With": "XMLHttpRequest",
+                    "X-CSRF-TOKEN": $('input[name="_token"]').val()
+                },
+                method: 'post',
+                credentials: "same-origin",
+                body: JSON.stringify({
+                    bookingId: bookingId,
+                    salonId: salonId,
+                })
+            })
+                .then((response) => {
+                    if(response.status === 200){
                         Swal.fire({
                             position: 'top-end',
                             icon: 'success',

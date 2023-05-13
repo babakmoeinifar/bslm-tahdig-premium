@@ -81,14 +81,10 @@ class LunchController extends Controller
 
     public function reserveSubmitAjax(Request $request)
     {
-//        $data = $request->except('_token');
-
         if ((int)OptionController::get('disable-tahdig') === 1) {
             return response('متاسفانه رزرو غذا غیرفعاله.', 406);
         }
 
-//        foreach ($data['booking'] as $booking_id => $booking) {
-//            foreach ($booking as $food_id => $quantity) {
         $quantity = $request->qty;
         $booking_id = $request->bookingId;
         $food_id = $request->foodId;
@@ -118,6 +114,17 @@ class LunchController extends Controller
         }
 
         return redirect('lunch/history');
+    }
+
+    public function changeSalon(Request $request)
+    {
+        $booking_id = $request->bookingId;
+        $salon_id = $request->salonId;
+        $reserves = TahdigReservation::where('user_id', auth()->id())->where('booking_id', $booking_id)->get();
+        foreach ($reserves as $reserve){
+            $reserve->salon_id = $salon_id;
+            $reserve->update();
+        }
     }
 
     public function history()
