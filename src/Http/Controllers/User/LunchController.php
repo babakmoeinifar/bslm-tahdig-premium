@@ -26,8 +26,9 @@ class LunchController extends Controller
             ->orderBy('booking_date', 'asc')->get();
 
        $data = [];
+
         foreach ($bookings as $booking) {
-            $dayOfWeek = Carbon::parse($booking->booking_date)->format('l');
+            $dayOfWeek = $booking->booking_date;
             if (!isset($data[$dayOfWeek])) {
                 $data[$dayOfWeek] = [];
             }

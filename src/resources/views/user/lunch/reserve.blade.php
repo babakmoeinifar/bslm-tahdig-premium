@@ -20,17 +20,6 @@
         </div>
 
     @else
-        @php
-            $daysOfWeek = [
-               'Saturday' => 'شنبه',
-               'Sunday' => 'یکشنبه',
-               'Monday' => 'دوشنبه',
-               'Tuesday' => 'سشنبه',
-               'Wednesday' => 'چهارشنبه',
-               'Thursday' => 'پنجشنبه',
-               'Friday' => 'جمعه',
-           ];
-        @endphp
 
         <form action="{{ url('lunch/reserve') }}" method="post">
             @csrf
@@ -38,12 +27,10 @@
                 <nav>
                     <ul class="nav nav-tabs border-bottom">
                         @foreach($data as $dayOfWeek => $bookings)
-                            @php $dayOfWeekPersian = $daysOfWeek[$dayOfWeek]; @endphp
-
                             <li class="nav-item">
                                 <a class="nav-link @if($loop->first) active @endif"
-                                   data-bs-toggle="tab" href="#{{ $dayOfWeek }}"
-                                >{{ $dayOfWeekPersian }}
+                                   data-bs-toggle="tab" href="#id-{{ $dayOfWeek }}"
+                                >{{ jdf_format($dayOfWeek,'l') }}
                                 </a>
                             </li>
                         @endforeach
@@ -55,15 +42,12 @@
 
                     @foreach($data as $dayOfWeek => $bookings)
                         <div class="tab-pane fade @if($loop->first) show active @endif"
-                             id="{{ $dayOfWeek }}">
+                             id="id-{{ $dayOfWeek }}">
                             <h5 class="pt-3">{{ jdfw($bookings[0]->booking_date) }}</h5>
                             <div class="row row-cols-1 row-cols-md-3 mt-4">
                                 @foreach($bookings as $booking)
                                     <div class="col mb-4">
                                         <div class="card h-100 border rounded">
-                                            @if($bookings[0]->booking_date != $booking->booking_date)
-                                                <h6 class="pt-3">{{ jdfw($booking->booking_date) }}</h6>
-                                            @endif
                                             <div class="card-body mb-0 pb-0">
                                                 <h4 class="card-title ss02 mb-3"
                                                     style="font-size: 1.4rem">{{ $booking->meal->name }}</h4>
@@ -108,8 +92,10 @@
                                                     <label for="quantity" class="col-sm-3 col-form-label"
                                                            style="font-weight: 400;font-size: 13px">ساختمان</label>
                                                     <div class="col-sm-4">
-                                                        <select class="form-control form-select" id="salonId-{{$booking->id}}"
-                                                                name="salon[{{ $booking->id }}]" style="font-size: 12px" onchange="salonChanged({{$booking->id}})">
+                                                        <select class="form-control form-select"
+                                                                id="salonId-{{$booking->id}}"
+                                                                name="salon[{{ $booking->id }}]" style="font-size: 12px"
+                                                                onchange="salonChanged({{$booking->id}})">
                                                             <option value="1">---</option>
                                                             @foreach($salons as $salon)
                                                                 <option value="{{ $salon->id }}"
@@ -161,7 +147,8 @@
             width: 100%;
             background-color: white;
         }
-        .btn-decrement{
+
+        .btn-decrement {
             border: 1px solid #ced4da;
             border-radius: 0.25rem;
             border-top-right-radius: 0;
@@ -170,7 +157,8 @@
             background-color: #e9ecef;
             border-right: 0;
         }
-        .btn-increment{
+
+        .btn-increment {
             border: 1px solid #ced4da;
             border-radius: 0.25rem;
             border-top-left-radius: 0;
@@ -179,14 +167,16 @@
             background-color: #e9ecef;
             border-left: 0;
         }
-        .swal2-popup{
+
+        .swal2-popup {
             width: 11.2em !important;
             font-size: 0.5rem !important;
             z-index: 999;
         }
+
         .swal2-container.swal2-backdrop-show, .swal2-container.swal2-noanimation {
             background: none !important;
-            box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+            box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15) !important;
         }
 
     </style>
@@ -198,7 +188,7 @@
 
         function updateFoodValue(foodId, elementId, qty, bookingId) {
             let inputValue = $('#' + elementId).val();
-            let salonId = $('#salonId-' + bookingId ).val();
+            let salonId = $('#salonId-' + bookingId).val();
 
             fetch('/lunch/reserve', {
                 headers: {
@@ -217,10 +207,10 @@
                 })
             })
                 .then((response) => {
-                    if(response.status === 200){
+                    if (response.status === 200) {
                         if (inputValue > 0) {
                             $('#foodName-' + elementId).css({"color": "#ff4501", "font-weight": "900"})
-                        }else {
+                        } else {
                             $('#foodName-' + elementId).css({"color": "", "font-weight": "500"})
                         }
                         Swal.fire({
@@ -244,8 +234,8 @@
                 });
         }
 
-        function salonChanged(bookingId){
-            let salonId = $('#salonId-' + bookingId ).val();
+        function salonChanged(bookingId) {
+            let salonId = $('#salonId-' + bookingId).val();
 
             fetch('/lunch/reserve/changeSalon', {
                 headers: {
@@ -262,7 +252,7 @@
                 })
             })
                 .then((response) => {
-                    if(response.status === 200){
+                    if (response.status === 200) {
                         Swal.fire({
                             position: 'top-end',
                             icon: 'success',
