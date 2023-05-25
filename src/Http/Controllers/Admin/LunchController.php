@@ -138,7 +138,7 @@ class LunchController extends Controller
 
         $data['bookings'] = TahdigBooking::with('meal')
             ->orderBy('booking_date', 'desc')
-            ->get();
+            ->paginate(50);
 
         $data['saloons'] = Salon::where('is_active', true)->get();
         $data['is_temporary_disabled'] = (int)OptionController::get('disable-tahdig') === 1;
