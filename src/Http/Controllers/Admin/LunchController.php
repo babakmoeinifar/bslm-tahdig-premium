@@ -138,6 +138,7 @@ class LunchController extends Controller
 
         $data['bookings'] = TahdigBooking::with('meal')
             ->orderBy('booking_date', 'desc')
+            ->groupBy('booking_date')
             ->paginate(50);
 
         $data['saloons'] = Salon::where('is_active', true)->get();
@@ -146,16 +147,19 @@ class LunchController extends Controller
         return view('tahdig::admin.lunch.reservation', $data);
     }
 
-    public function reservationDetail(Request $request, $booking_id, $saloon_id)
+    public function reservationDetail($booking_date, $saloon_id)
     {
         is_allowed('reservation_view');
 
-        $booking = TahdigBooking::with(['reservations', 'reservations.user', 'reservations.food.restaurant'])
-            ->findOrFail($booking_id);
+        $bookings = TahdigBooking::with(['reservations', 'reservations.user', 'meal'])
+            ->where('booking_date', $booking_date)->get();
 
-        $data['booking'] = $booking->reservations->where('salon_id', $saloon_id);
-        $data['foods'] = $data['booking']->groupBy('food_id');
-
+        $results = [];
+        foreach ($bookings as $booking) {
+            $result = $booking->reservations->where('salon_id', $saloon_id);
+            $results[] = [$booking->meal, $result];
+        }
+        $data['foods'] = $results;
         return view('tahdig::admin.lunch.reservation-detail', $data);
     }
 
@@ -319,24 +323,31 @@ class LunchController extends Controller
         return view('tahdig::admin.lunch.food-all', $data);
     }
 
-    public function reserveForUser(Request $request, $id)
+    public function reserveForUser(Request $request, $booking_date)
     {
         is_allowed('reservation_management');
 
-        return view('tahdig::admin.lunch.reserve-for-user', ['id' => $id]);
+        return view('tahdig::admin.lunch.reserve-for-user', ['booking_date' => $booking_date]);
     }
 
-    public function reservationReport(Request $request, $booking_id)
+    public function reservationReport(Request $request, $booking_date)
     {
         is_allowed('reservation_view');
 
-        $booking = TahdigBooking::with(['reservations', 'reservations.user', 'reservations.food.restaurant'])
-            ->findOrFail($booking_id);
-
-        $data['booking'] = $booking->reservations;
-        $data['foods'] = $data['booking']->groupBy('food_id');
+        $bookings = TahdigBooking::with(['reservations', 'reservations.user', 'reservations.food.restaurant'])
+            ->where('booking_date', $booking_date)->get();
+        $results = [];
+        $resultOfBooking = [];
+        foreach ($bookings as $booking) {
+            $resultBooking = $booking->reservations;
+            $resultOfBooking[] = $resultBooking;
+            $result = $booking->reservations->groupBy('food_id');
+            $results[] = $result;
+        }
+        $data['bookings'] = $resultOfBooking;
+        $data['foods'] = $results;
         $data['tahdigSalons'] = Salon::get();
-
+        $data['booking_date'] = $booking_date;
         return view('tahdig::admin.lunch.reservation-report', $data);
     }
 }

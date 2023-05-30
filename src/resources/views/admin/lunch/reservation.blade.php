@@ -14,7 +14,7 @@
                     <tr>
                         <th scope="col">#</th>
                         <th scope="col">تاریخ</th>
-                        <th scope="col">وعده</th>
+{{--                        <th scope="col">وعده</th>--}}
                         <th scope="col"></th>
                     </tr>
                     </thead>
@@ -23,17 +23,17 @@
                         <tr>
                             <td>{{ $booking->id }}</td>
                             <td>{{ jdfw($booking->booking_date) }}</td>
-                            <td>{{ $booking->meal->name }}</td>
+{{--                            <td>{{ $booking->meal->name }}</td>--}}
                             <td>
                                 @foreach($saloons as $saloon)
-                                    <a href="{{ url('admin/lunch/reservation/'. $booking->id. '/'. $saloon->id) }}"
+                                    <a href="{{ url('admin/lunch/reservation/'. $booking->booking_date. '/'. $saloon->id) }}"
                                        class="btn btn-outline-primary">
                                         {{ $saloon->name }}
                                     </a>
                                 @endforeach
-                                <a href="{{ url('admin/lunch/reservation/report/'. $booking->id) }}"
+                                <a href="{{ url('admin/lunch/reservation/report/'. $booking->booking_date) }}"
                                    class="btn btn-outline-primary">آمار</a>
-                                <a href="{{ url('admin/lunch/reservation/for-user/'. $booking->id) }}"
+                                <a href="{{ url('admin/lunch/reservation/for-user/'. $booking->booking_date) }}"
                                    class="btn btn-outline-primary">افزودن</a>
                             </td>
                         </tr>

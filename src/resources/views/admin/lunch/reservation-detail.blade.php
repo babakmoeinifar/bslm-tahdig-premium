@@ -11,6 +11,7 @@
                     <th scope="col">پرسنلی</th>
                     <th scope="col">اسم</th>
                     <th scope="col">غذا</th>
+                    <th scope="col">وعده</th>
                     <th scope="col">رستوران</th>
                     <th scope="col">دریافت</th>
                 </tr>
@@ -18,9 +19,9 @@
                 <tbody>
                 @foreach($foods as $food)
                     @php
-                        $food = $food->sortBy('user.id')
+                        $food[1] = $food[1]->sortBy('user.id')
                     @endphp
-                    @foreach($food as $reservation)
+                    @foreach($food[1] as $reservation)
                         <tr class="@if(!is_null($reservation->received_at)) text-black-50 text-decoration-line-through @endif">
                             <td>{{ $reservation->user->employee_id }}</td>
                             <td>{{ $reservation->user->name }}</td>
@@ -30,6 +31,7 @@
                                 @endif
                                 {{ $reservation->food->name }}
                             </td>
+                            <td>{{ $food[0]->name }}</td>
                             <td>{{ $reservation->food->restaurant->name }}</td>
                             <td>
                                 <button class="btn btn-info received @if(!is_null($reservation->received_at)) disabled @endif"

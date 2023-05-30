@@ -9,15 +9,21 @@
             @include('template.messages')
             <div class="form-group">
                 <label>نام غذا:</label>
-                <select name="food" class="form-select" wire:model.defer='foodId'>
+                <select name="food" class="form-select" wire:model.defer='bookId_foodId' onchange="$('#bookingId').val(this.options[this.selectedIndex].id)">
                     <option value="">انتخاب کنید</option>
-                    @foreach($booking->foods as $food)
-                        <option value="{{ $food->id }}">
-                            {{ $food->name }} {{ $food->price }} تومان
-                        </option>
+                    @foreach($bookings as $booking)
+                        @foreach($booking->foods as $food)
+                            <option value="{{$booking->id}},{{ $food->id }}" id="{{ $booking->id }}">
+                                {{ $booking->meal->name }} - {{ $food->name }} {{ $food->price }}
+                                تومان
+                            </option>
+                        @endforeach
                     @endforeach
                 </select>
             </div>
+
+            <input type='hidden' value='' wire:model.defer='bookingId' id="bookingId">
+
             <div class="form-group">
                 <label>نام ساختمان:</label>
                 <select name="salon" wire:model.defer='salonId' class="form-select">
@@ -55,3 +61,16 @@
         <button class="btn btn-primary ml-auto" type="submit" wire:click="submitReserve">ثبت</button>
     </div>
 </div>
+
+@push('js')
+    <script>
+        document.addEventListener('livewire:load', function () {
+
+            function persistBookingId(bookingId) {
+                console.log(bookingId);
+                $('#bookingId').val(bookingId);
+            }
+        })
+    </script>
+@endpush
+

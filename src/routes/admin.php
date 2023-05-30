@@ -11,9 +11,9 @@ Route::group(['prefix' => 'admin/lunch', 'middleware' => 'web', 'namespace' => '
             Route::get('/create', [C\LunchController::class, 'reservationCreate']);
             Route::post('/create', [C\LunchController::class, 'reservationCreateSubmit']);
             Route::get('/', [C\LunchController::class, 'reservation']);
-            Route::get('/for-user/{id}', [C\LunchController::class, 'reserveForUser']);
-            Route::get('/report/{booking_id}', [C\LunchController::class, 'reservationReport']);
-            Route::get('/{booking_id}/{saloon_id}', [C\LunchController::class, 'reservationDetail']);
+            Route::get('/for-user/{booking_date}', [C\LunchController::class, 'reserveForUser']);
+            Route::get('/report/{booking_date}', [C\LunchController::class, 'reservationReport']);
+            Route::get('/{booking_date}/{saloon_id}', [C\LunchController::class, 'reservationDetail']);
             Route::post('/toggleReserve', [C\LunchController::class, 'temporaryToggleReserve']);
         });
 

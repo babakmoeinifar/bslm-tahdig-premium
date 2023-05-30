@@ -4,8 +4,8 @@
 
 @section('content')
     <div class="row">
-        <div class="col-12 col-md-4">
-            @livewire('tahdig::components.reserve-food', ['id' => $id])
+        <div class="col-12 col-md-6">
+            @livewire('tahdig::components.reserve-food', ['booking_date' => $booking_date])
         </div>
     </div>
 @endsection
