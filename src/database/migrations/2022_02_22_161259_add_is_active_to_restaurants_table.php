@@ -13,7 +13,7 @@ class AddIsActiveToRestaurantsTable extends Migration
      */
     public function up()
     {
-        Schema::table('restaurants', function (Blueprint $table) {
+        Schema::table('tahdig_restaurants', function (Blueprint $table) {
             $table->boolean('is_active')->default(1);
         });
     }
@@ -25,7 +25,7 @@ class AddIsActiveToRestaurantsTable extends Migration
      */
     public function down()
     {
-        Schema::table('restaurants', function (Blueprint $table) {
+        Schema::table('tahdig_restaurants', function (Blueprint $table) {
             $table->dropColumn('is_active');
         });
     }

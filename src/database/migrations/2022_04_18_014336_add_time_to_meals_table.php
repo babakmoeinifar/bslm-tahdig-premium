@@ -8,7 +8,7 @@ class AddTimeToMealsTable extends Migration
 {
     public function up()
     {
-        Schema::table('meals', function (Blueprint $table) {
+        Schema::table('tahdig_meals', function (Blueprint $table) {
             $table->time('serve_at');
             $table->tinyInteger('block_time');
         });
@@ -16,7 +16,7 @@ class AddTimeToMealsTable extends Migration
 
     public function down()
     {
-        Schema::table('meals', function (Blueprint $table) {
+        Schema::table('tahdig_meals', function (Blueprint $table) {
             $table->dropColumn('serve_at');
             $table->dropColumn('block_time');
         });

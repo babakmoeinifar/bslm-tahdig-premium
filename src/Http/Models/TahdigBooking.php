@@ -12,12 +12,12 @@ class TahdigBooking extends Model
 
     public function foods()
     {
-        return $this->belongsToMany(Food::class, 'food_tahdig_booking', 'booking_id');
+        return $this->belongsToMany(Food::class, 'tahdig_food_tahdig_booking', 'booking_id');
     }
 
     public function foodsForInter()
     {
-        return $this->belongsToMany(Food::class, 'food_tahdig_booking', 'booking_id')
+        return $this->belongsToMany(Food::class, 'tahdig_food_tahdig_booking', 'booking_id')
             ->wherePivot('for_inter', true);
     }
 
