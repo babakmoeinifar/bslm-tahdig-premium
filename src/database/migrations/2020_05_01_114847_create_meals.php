@@ -8,7 +8,7 @@ class CreateMeals extends Migration
 {
     public function up()
     {
-        Schema::create('meals', function (Blueprint $table) {
+        Schema::create('tahdig_meals', function (Blueprint $table) {
             $table->id();
             $table->string('name');
         });
@@ -16,6 +16,6 @@ class CreateMeals extends Migration
 
     public function down()
     {
-        Schema::dropIfExists('meals');
+        Schema::dropIfExists('tahdig_meals');
     }
 }

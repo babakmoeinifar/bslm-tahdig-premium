@@ -102,9 +102,9 @@ class LunchController extends Controller
         is_allowed('reservation_management');
 
         $request->validate([
-            'meal' => 'required|exists:meals,id',
+            'meal' => 'required|exists:tahdig_meals,id',
             'foods' => 'array',
-            'foods.*' => 'nullable|distinct|exists:foods,id|different:food_main',
+            'foods.*' => 'nullable|distinct|exists:tahdig_foods,id|different:food_main',
         ]);
 
         $booking = new TahdigBooking();
@@ -175,7 +175,7 @@ class LunchController extends Controller
         is_allowed('food_management');
 
         $request->validate([
-            'name' => 'required|string|unique:restaurants,name',
+            'name' => 'required|string|unique:tahdig_restaurants,name',
         ]);
 
         $restaurant = new Restaurant();
@@ -191,11 +191,11 @@ class LunchController extends Controller
 
         $data['restaurants'] = Restaurant::all();
 
-        $data['restaurantScores'] = TahdigReservation::join('foods', 'foods.id', 'tahdig_reservations.food_id')
-            ->join('restaurants', 'restaurants.id', 'foods.restaurant_id')
-            ->join('comments', 'comments.commentable_id', 'tahdig_reservations.id')->groupBy('restaurant_id')
-            ->where('comments.commentable_type', \Bslm\Tahdig\Http\Models\TahdigReservation::class)
-            ->selectRaw('avg(comments.score) as score, foods.restaurant_id')
+        $data['restaurantScores'] = TahdigReservation::join('tahdig_foods', 'tahdig_foods.id', 'tahdig_reservations.food_id')
+            ->join('tahdig_restaurants', 'tahdig_restaurants.id', 'tahdig_foods.restaurant_id')
+            ->join('cms_comments', 'cms_comments.commentable_id', 'tahdig_reservations.id')->groupBy('restaurant_id')
+            ->where('cms_comments.commentable_type', \Bslm\Tahdig\Http\Models\TahdigReservation::class)
+            ->selectRaw('avg(cms_comments.score) as score, tahdig_foods.restaurant_id')
             ->get();
 
         return view('tahdig::admin.lunch.restaurant-all', $data);
@@ -216,7 +216,7 @@ class LunchController extends Controller
 
         $restaurant = Restaurant::find($request->get('id'));
         $request->validate([
-            'name' => ['required', 'string', Rule::unique('restaurants')->ignore($restaurant->id)],
+            'name' => ['required', 'string', Rule::unique('tahdig_restaurants')->ignore($restaurant->id)],
             'is_active' => 'required',
         ]);
 
@@ -256,7 +256,7 @@ class LunchController extends Controller
 
         $request->validate([
             'name' => 'required|string',
-            'restaurant' => 'required|exists:restaurants,id',
+            'restaurant' => 'required|exists:tahdig_restaurants,id',
             'price' => 'required|numeric',
         ]);
 
@@ -283,7 +283,7 @@ class LunchController extends Controller
         is_allowed('food_management');
 
         $request->validate([
-            'id' => 'required|exists:foods,id',
+            'id' => 'required|exists:tahdig_foods,id',
             'price' => 'required|numeric',
         ]);
 
@@ -299,7 +299,7 @@ class LunchController extends Controller
         is_allowed('food_view');
 
         $data['comments'] = Comment::where(['commentable_type' => 'Bslm\Tahdig\Http\Models\TahdigReservation'])
-            ->leftJoin('tahdig_reservations', 'tahdig_reservations.id', 'comments.commentable_id')
+            ->leftJoin('tahdig_reservations', 'tahdig_reservations.id', 'cms_comments.commentable_id')
             ->where('tahdig_reservations.food_id', $id)
             ->paginate(40);
         return view('tahdig::admin.lunch.food-comments', $data);

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Meal extends Model
 {
+    protected $table = 'tahdig_meals';
     public $timestamps = false;
 
     public static function all($columns = ['*'])

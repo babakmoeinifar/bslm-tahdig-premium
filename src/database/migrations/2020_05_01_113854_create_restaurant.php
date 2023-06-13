@@ -8,7 +8,7 @@ class CreateRestaurant extends Migration
 {
     public function up()
     {
-        Schema::create('restaurants', function (Blueprint $table) {
+        Schema::create('tahdig_restaurants', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->timestamps();
@@ -18,6 +18,6 @@ class CreateRestaurant extends Migration
 
     public function down()
     {
-        Schema::dropIfExists('restaurants');
+        Schema::dropIfExists('tahdig_restaurants');
     }
 }

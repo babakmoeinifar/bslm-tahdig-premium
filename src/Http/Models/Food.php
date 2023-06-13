@@ -9,7 +9,7 @@ class Food extends Model
 {
     use softDeletes;
 
-    protected $table = 'foods';
+    protected $table = 'tahdig_foods';
 
     public function bookings()
     {
