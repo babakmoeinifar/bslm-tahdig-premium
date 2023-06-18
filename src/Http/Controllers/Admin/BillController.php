@@ -58,7 +58,7 @@ class BillController extends Controller
                 
                 ON tr.booking_id = tb.id
                 
-                WHERE tb.booking_date >= u.settlement_at
+                WHERE tb.booking_date >= u.settlement_at and tb.booking_date <= now()
                 
                 GROUP BY u.id) ff
                 
@@ -106,7 +106,7 @@ class BillController extends Controller
                 
                 ON tr.booking_id = tb.id
                 
-                WHERE tb.booking_date >= u.settlement_at
+                WHERE tb.booking_date >= u.settlement_at and tb.booking_date <= now()
                 
                 GROUP BY u.id) ff
                 
