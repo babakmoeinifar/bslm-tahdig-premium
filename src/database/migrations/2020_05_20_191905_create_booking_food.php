@@ -8,7 +8,7 @@ class CreateBookingFood extends Migration
 {
     public function up()
     {
-        Schema::create('booking_food', function (Blueprint $table) {
+        Schema::create('tahdig_food_tahdig_booking', function (Blueprint $table) {
             $table->id();
             $table->unsignedInteger('food_id');
             $table->unsignedInteger('booking_id');
@@ -18,6 +18,6 @@ class CreateBookingFood extends Migration
 
     public function down()
     {
-        Schema::dropIfExists('booking_food');
+        Schema::dropIfExists('tahdig_food_tahdig_booking');
     }
 }
