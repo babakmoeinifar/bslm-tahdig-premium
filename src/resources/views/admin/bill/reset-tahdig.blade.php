@@ -1,13 +1,13 @@
 @extends('template.master-admin')
 
-@section('title', 'صفر شدن حساب ته دیگ')
+@section('title', 'اجرای فرآیند تسویه حساب')
 
 @section('content')
     <div class="page-title mb-3 d-print-none">
         <div class="row">
             <div class="col-md-4">
                 <h3>
-                    صفر شدن حساب ته دیگ
+                    اجرای فرآیند تسویه حساب
                 </h3>
             </div>
         </div>
@@ -17,29 +17,18 @@
             <div class="card">
                 <div class="card-content">
                     <div class="card-body">
-                        <form method="post" action="{{ url('admin/bills/reset-tahdig/' ) }}">
-                            @csrf
-                            
-                            <div class="form-group">
-                                <label>انتخاب کاربر</label>
-                                <select class="form-control form-select users-list" name="users">
-                                    <option value="">انتخاب کاربر</option>
-                                    <option value="all">همه</option>
-                                    @foreach($data['users'] as $user)
-                                        <option value="{{$user['id']}}">{{$user['name'] . '(' . $user['employeeId'] . ')' }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>تاریخ تسویه</label>
-                                <input type="text" class="form-control" name="" id="settlement_at" value="">
-                                <input type="hidden" class="form-control" name="settlement_at_alt" id="settlement_at_alt">
-                            </div>
-                            
-                            <button type="submit" class="btn btn-primary">تسویه</button>
-                            <a class="btn btn-secondary" href="{{ url('/admin/bills/lunch-users/') }}">بازگشت</a>
 
-                        </form>
+                        <div id="preloader">
+                            <div class="spinner"></div>
+                        </div>
+
+                        <div class="progress mb-3">
+                            <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0"
+                                 aria-valuemax="100"></div>
+                        </div>
+
+                        <div id="progress-container" style="min-height: 300px"></div>
+
                     </div>
                 </div>
             </div>
@@ -48,28 +37,115 @@
 @endsection
 
 @push('css')
-    <link href="{{ asset('css/persian-datepicker.min.css') }}" rel="stylesheet">
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta2/dist/css/bootstrap-select.min.css">
+    <style>
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: transparent;
+            z-index: 9999;
+        }
+
+        .spinner {
+            position: absolute;
+            top: 35%;
+            right: 35%;
+            width: 50px;
+            height: 50px;
+            border: 5px solid #ccc;
+            border-top-color: #333;
+            border-radius: 50%;
+            animation: spin 1s infinite linear;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+    </style>
 @endpush
-
 @push('js')
-    <script src="{{ asset('js/persian-date.min.js') }}"></script>
-    <script src="{{ asset('js/persian-datepicker.min.js') }}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta2/dist/js/bootstrap-select.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            
-            $("#settlement_at").pDatepicker({
-                altField: '#settlement_at_alt',
-                altFormat: 'X',
-                format: 'YYYY/MM/DD',
-                observer: true
-            })
 
-            $('.users-list').selectpicker({
-                liveSearch: true
-            })
+    <script>
+
+        $(document).ready(function () {
+            function automateSettle() {
+                $('#preloader').show();
+
+                $.ajax({
+                    url: '/automate-settle',
+                    type: 'POST',
+                    dataType: 'json',
+                    success: function (data) {
+                        var progressContainer = $('#progress-container');
+                        var progressBar = $('.progress-bar');
+
+                        var progressMessages = data.messages;
+                        var progressContainer = $('#progress-container');
+
+                        $('#preloader').hide();
+
+                        printMessagesWithDelay(progressMessages, progressContainer, progressBar)
+                            .then(function () {
+                                progressBar.width('100%');
+                                progressBar.text('پایان فرآیند تسوه حساب');
+
+                                redirect('/admin/bills/lunch-users-export')
+                                    .then(function () {
+                                        progressContainer.append('<p>' + 'آماده سازی خروجی اکسل، دانلود به صورت اتوماتیک انجام میشود، لطفاً تا پایان دانلود رفرش نکنید...' + '</p>');
+                                    });
+                            })
+                            .catch(function (error) {
+                                console.error(error);
+                            });
+
+
+                    },
+                    error: function (xhr, status, error) {
+                        console.error(error);
+                    }
+                });
+            }
+
+            automateSettle();
+
+            function printMessagesWithDelay(messages, container, progressBar) {
+                return new Promise(function (resolve, reject) {
+                    var i = 0;
+                    var totalMessages = messages.length;
+                    var progressPercentage = 0;
+
+                    function printMessage() {
+                        if (i < totalMessages) {
+                            var message = messages[i];
+                            container.append('<p>' + message + '</p>');
+                            i++;
+
+                            progressPercentage = Math.round((i / totalMessages) * 100);
+                            progressBar.width(progressPercentage + '%');
+                            progressBar.text(progressPercentage + '%');
+
+                            setTimeout(printMessage, 2000);
+                        } else {
+                            resolve();
+                        }
+                    }
+
+                    printMessage();
+                });
+            }
+
+            function redirect(url) {
+                return new Promise(function (resolve, reject) {
+                    window.location.replace(url);
+                    resolve();
+                });
+            }
+
         });
     </script>
 @endpush

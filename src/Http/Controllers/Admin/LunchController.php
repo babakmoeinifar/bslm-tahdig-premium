@@ -2,6 +2,7 @@
 
 namespace Bslm\Tahdig\Http\Controllers\Admin;
 
+use App\Exports\BillExport;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\OptionController;
 use App\Models\Comment;
@@ -11,11 +12,13 @@ use Bslm\Tahdig\Http\Models\Food;
 use Bslm\Tahdig\Http\Models\Meal;
 use Bslm\Tahdig\Http\Models\Restaurant;
 use Bslm\Tahdig\Http\Models\TahdigBooking;
+use Bslm\Tahdig\Http\Models\TahdigLogs;
 use Bslm\Tahdig\Http\Models\TahdigReservation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Maatwebsite\Excel\Facades\Excel;
 
 class LunchController extends Controller
 {
@@ -62,25 +65,6 @@ class LunchController extends Controller
                 );
             }
         }
-
-    }
-
-    public static function temporaryToggleReserve(Request $request)
-    {
-        is_allowed('reservation_management');
-
-        $request->validate([
-            'toggle' => 'required|string',
-        ]);
-
-        $cur = $request['toggle'];
-        OptionController::set('disable-tahdig', $cur);
-
-        return response()->json([
-            'data' => [],
-            'code' => 1,
-            'message' => 'عملیات با موفقیت انجام شد',
-        ]);
 
     }
 
@@ -349,5 +333,46 @@ class LunchController extends Controller
         $data['tahdigSalons'] = Salon::get();
         $data['booking_date'] = $booking_date;
         return view('tahdig::admin.lunch.reservation-report', $data);
+    }
+
+    public function automateSettle(Request $request)
+    {
+        $messages = [];
+
+        //1
+        OptionController::set('disable-tahdig', 1);
+        $messages[] = 'ته دیگ غیرفعال شد.';
+
+        //2
+        $users = User::all();
+        foreach ($users as $user) {
+            $result[$user->id] = [
+                'user_id' => $user->id,
+                'year' => (int)jdate2("Y", time(), null, null, 'en'),
+                'month' => (int)jdate2("m", time(), null, null, 'en'),
+                'balance' => $user->balance
+            ];
+        }
+        $settlement_at = now();
+        foreach ($users as $user) {
+            $item = $result[$user->id];
+            $row = new TahdigLogs();
+            $row->user_id = $item['user_id'];
+            $row->year = $item['year'];
+            $row->month = $item['month'];
+            $row->charge = (double)$item['balance'];
+            $row->settlement_at = $settlement_at;
+            $row->save();
+
+            // update settlement date
+            User::where('id', $user->id)->update(['settlement_at' => $settlement_at]);
+        }
+        $messages[] = 'حساب همه‌ی کسانی که حساب‌شون منفی بوده ۰ شد.';
+
+        //3
+        OptionController::set('disable-tahdig', 0);
+        $messages[] = 'ته دیگ فعال شد.';
+
+        return response()->json(['messages' => $messages]);
     }
 }
