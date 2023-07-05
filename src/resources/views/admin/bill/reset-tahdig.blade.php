@@ -29,6 +29,9 @@
 
                         <div id="progress-container" style="min-height: 300px"></div>
 
+                        <form action="{{ url('/admin/bills/lunch-users-export') }}" method="POST" id="resultForm">
+                            @csrf
+                        </form>
                     </div>
                 </div>
             </div>
@@ -71,19 +74,19 @@
 @push('js')
 
     <script>
-
         $(document).ready(function () {
             function automateSettle() {
                 $('#preloader').show();
 
                 $.ajax({
                     url: '/automate-settle',
-                    type: 'POST',
+                    type: 'get',
                     dataType: 'json',
                     success: function (data) {
                         var progressContainer = $('#progress-container');
                         var progressBar = $('.progress-bar');
 
+                        var resultForExcelExport = data.result;
                         var progressMessages = data.messages;
                         var progressContainer = $('#progress-container');
 
@@ -94,10 +97,12 @@
                                 progressBar.width('100%');
                                 progressBar.text('پایان فرآیند تسوه حساب');
 
-                                redirect('/admin/bills/lunch-users-export')
+                                redirect(resultForExcelExport)
                                     .then(function () {
                                         progressContainer.append('<p>' + 'آماده سازی خروجی اکسل، دانلود به صورت اتوماتیک انجام میشود، لطفاً تا پایان دانلود رفرش نکنید...' + '</p>');
-                                    });
+                                    }).then(()=>{
+                                    progressContainer.append('<a href="{{ url('/admin/bills/lunch-users') }}" class="btn btn-outline-primary">' + 'بازگشت به لیست حساب غذا' + '</a>');
+                                });
                             })
                             .catch(function (error) {
                                 console.error(error);
@@ -139,9 +144,12 @@
                 });
             }
 
-            function redirect(url) {
+            function redirect(resultForExcelExport) {
                 return new Promise(function (resolve, reject) {
-                    window.location.replace(url);
+                    let resultForm = $('#resultForm');
+                    let input = $('<input type="hidden" name="result" value="">').val(JSON.stringify(resultForExcelExport));
+                    resultForm.append(input);
+                    resultForm.submit();
                     resolve();
                 });
             }

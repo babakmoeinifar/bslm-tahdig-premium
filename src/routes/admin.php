@@ -43,7 +43,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'web', 'namespace' => 'Bslm\T
 
         Route::group(['prefix' => 'bills'], function () {
             Route::get('/lunch-users', [C\BillController::class, 'lunchUsers']);
-            Route::get('/lunch-users-export', [C\BillController::class, 'lunchUserExport']);
+            Route::post('/lunch-users-export', [C\BillController::class, 'lunchUserExport']);
             Route::get('/restaurants', [C\BillController::class, 'restaurants']);
             Route::get('/reset-tahdig', [C\BillController::class, 'resetTahdig']);
             Route::post('/reset-tahdig', [C\BillController::class, 'resetTahdigSubmit']);

@@ -344,9 +344,39 @@ class LunchController extends Controller
         $messages[] = 'ته دیگ غیرفعال شد.';
 
         //2
-        $users = User::all();
-        foreach ($users as $user) {
-            $result[$user->id] = [
+        $result = DB::table('users as u')
+            ->select(
+                'u.id',
+                'u.employee_id',
+                'u.name',
+                'ff.cost',
+                DB::raw('ifnull(uu.credits, 0) - ifnull(ff.cost, 0) as balance'),
+                'u.settlement_at',
+                'uu.credits',
+                'u.deactivated_at',
+            )
+            ->join(DB::raw('(SELECT u.id, SUM(d.charge_amount) as credits, COUNT(*) as cday
+                FROM users u
+                LEFT JOIN days d ON DATE_SUB(u.settlement_at, INTERVAL 1 day) <= d.day
+                    AND (d.user_id = u.id OR d.user_id IS NULL)
+                    AND (u.deactivated_at > d.day OR u.deactivated_at IS NULL)
+                GROUP BY u.id, u.started_at) as uu'), 'u.id', '=', 'uu.id')
+            ->leftJoin(DB::raw('(SELECT u.id, SUM(tr.price * tr.quantity) as cost
+                FROM users u
+                LEFT JOIN tahdig_reservations tr ON u.id = tr.user_id
+                LEFT JOIN tahdig_bookings tb ON tr.booking_id = tb.id
+                WHERE tb.booking_date >= u.settlement_at AND tb.booking_date <= NOW()
+                GROUP BY u.id) as ff'), 'u.id', '=', 'ff.id')
+            ->where('deactivated_at', null)
+            ->orderBy('u.employee_id', 'asc')
+            ->get();
+        foreach ($result as $item) {
+            $item->settlement_at = jdf_format($item->settlement_at, 'Y/m/d  H:i:s');
+        }
+
+        //3
+        foreach ($result as $user) {
+            $myResult[$user->id] = [
                 'user_id' => $user->id,
                 'year' => (int)jdate2("Y", time(), null, null, 'en'),
                 'month' => (int)jdate2("m", time(), null, null, 'en'),
@@ -354,25 +384,25 @@ class LunchController extends Controller
             ];
         }
         $settlement_at = now();
-        foreach ($users as $user) {
-            $item = $result[$user->id];
+        foreach ($result as $user) {
+            $item = $myResult[$user->id];
             $row = new TahdigLogs();
             $row->user_id = $item['user_id'];
             $row->year = $item['year'];
             $row->month = $item['month'];
-            $row->charge = (double)$item['balance'];
+            $row->charge = $item['balance'];
             $row->settlement_at = $settlement_at;
             $row->save();
 
             // update settlement date
             User::where('id', $user->id)->update(['settlement_at' => $settlement_at]);
         }
-        $messages[] = 'حساب همه‌ی کسانی که حساب‌شون منفی بوده ۰ شد.';
+        $messages[] = 'حساب همه‌ی کسانی که حساب‌شون منفی بوده ۰ شد. (' . count($result) . ') نفر';
 
-        //3
+        //4
         OptionController::set('disable-tahdig', 0);
         $messages[] = 'ته دیگ فعال شد.';
 
-        return response()->json(['messages' => $messages]);
+        return response()->json(['messages' => $messages, 'result' => $result]);
     }
 }

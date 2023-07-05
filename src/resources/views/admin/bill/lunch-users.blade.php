@@ -8,10 +8,6 @@
                 <div class="col-md-4">
                     <h3>
                         مدیریت کاربران
-{{--                        <a href="{{ url('/admin/bills/lunch-users-export?'. http_build_query(request()->all())) }}"--}}
-{{--                        class="btn btn-light-primary">--}}
-{{--                            خروجی اکسل--}}
-{{--                        </a>--}}
                         <a href="{{ url('admin/bills/tahdig-logs') }}" class="btn btn-light-primary">تاریخچه</a>
 
                     </h3>
@@ -20,18 +16,7 @@
 
                 <div class="col-md-3 text-center">
                     <a href="{{ url('admin/bills/reset-tahdig') }}" class="btn btn-light-primary btn-reset-tahdig">اجرای فرآیند تسویه حساب</a>
-{{--                    <a href="{{ url('admin/reservation/automateSettle') }}" class="btn btn-light-primary btn-reset-tahdig">اجرای فرآیند تسویه حساب</a>--}}
                 </div>
-
-{{--                <div class="col-md-3 text-end">--}}
-{{--                    <div class="col-md-12">--}}
-{{--                        غیرفعال سازی موقت رزرو--}}
-{{--                        <label class="switch">--}}
-{{--                            <input type="checkbox" name="chk-toggle-tahdig" {{ $is_temporary_disabled ? 'checked=checked' : '' }} >--}}
-{{--                            <span class="slider round"></span>--}}
-{{--                        </label>--}}
-{{--                    </div>--}}
-{{--                </div>--}}
 
             <div class="col-md-5 text-end">
                     <form action="{{ url('/admin/bills/lunch-users') }}">
@@ -77,3 +62,10 @@
         </div>
     </div>
 @endsection
+@push('js')
+    <script>
+        $('.btn-reset-tahdig').click(function () {
+            return confirm('آیا از اجرای فرآیند تسویه حساب اطمینان دارید؟');
+        });
+    </script>
+@endpush

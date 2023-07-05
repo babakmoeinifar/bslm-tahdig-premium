@@ -102,11 +102,7 @@ class TahdigLogsController extends Controller
         $data['users'] = $data['users'] = UserController::getList();
         $data['userid'] = $userid;
 
-        // $url = "admin/bills/tahdig-logs/$userid/$ds/$de";
-        // return redirect($url);
         return $date_start ? view('tahdig::admin.bill.tahdig-logs', ['data' => $data]) : redirect("admin/bills/tahdig-logs/$userid/$ds/$de");
-        // return view('admin.bill.tahdig-logs', ['data' => $data]);
-
     }
 
     public function tahdigLogUserExcelExport()

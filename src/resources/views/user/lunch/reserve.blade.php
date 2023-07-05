@@ -104,7 +104,7 @@
                                                                                 selected
                                                                         @endif
                                                                         @else
-                                                                            @if($salon->id == auth()->user()->default_salon_id)
+                                                                            @if(auth()->user()->default_salon_id && $salon->id == auth()->user()->default_salon_id)
                                                                                 selected
                                                                         @endif
                                                                         @endif
