@@ -337,6 +337,7 @@ class LunchController extends Controller
 
     public function automateSettle(Request $request)
     {
+        is_allowed('billing_view');
         $messages = [];
 
         //1
