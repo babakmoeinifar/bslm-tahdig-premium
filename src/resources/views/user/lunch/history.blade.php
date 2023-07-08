@@ -53,14 +53,16 @@
                                 <td>{{ number_format($reservation->price) }}</td>
                                 <td>
                                     @if($reservation->date > now()->addHours(config('nahar.gap_hour'))->startOfDay())
-                                        <a href="{{ url('/lunch/reserve/'.$reservation->id.'/delete')}}"
-                                        class="btn-danger btn btn-sm">
-                                            حذف
-                                        </a>
+                                        @if(@$reservation->food->name)
+                                            <a href="{{ url('/lunch/reserve/'.$reservation->id.'/delete')}}"
+                                               class="btn-danger btn btn-sm">
+                                                حذف
+                                            </a>
+                                        @endif
                                     @else
                                         @if(!$reservation->comments && @$reservation->food->name)
                                             <a href="{{ url('/lunch/reserve/'.$reservation->id.'/rate')}}"
-                                            class="btn-warning btn btn-sm">
+                                               class="btn-warning btn btn-sm">
                                                 امتیاز دادن
                                             </a>
                                         @endif
@@ -77,6 +79,6 @@
             </div>
         @endif
 
-        
+
     </div>
 @endsection
