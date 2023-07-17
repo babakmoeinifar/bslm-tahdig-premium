@@ -96,7 +96,7 @@
                                                                 id="salonId-{{$booking->id}}"
                                                                 name="salon[{{ $booking->id }}]" style="font-size: 12px"
                                                                 onchange="salonChanged({{$booking->id}})">
-                                                            <option value="1">---</option>
+                                                            {{--                                                            <option value="">---</option>--}}
                                                             @foreach($salons as $salon)
                                                                 <option value="{{ $salon->id }}"
                                                                         @if($booking->reservationsForUser()->first())
@@ -190,48 +190,53 @@
             let inputValue = $('#' + elementId).val();
             let salonId = $('#salonId-' + bookingId).val();
 
-            fetch('/lunch/reserve', {
-                headers: {
-                    "Content-Type": "application/json",
-                    "Accept": "application/json, text-plain, */*",
-                    "X-Requested-With": "XMLHttpRequest",
-                    "X-CSRF-TOKEN": $('input[name="_token"]').val()
-                },
-                method: 'post',
-                credentials: "same-origin",
-                body: JSON.stringify({
-                    foodId: foodId,
-                    qty: inputValue,
-                    bookingId: bookingId,
-                    salonId: salonId,
+            if (!salonId) {
+                notification('خطا! ', 'ساختمان انتخاب شود')
+            } else {
+
+                fetch('/lunch/reserve', {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json, text-plain, */*",
+                        "X-Requested-With": "XMLHttpRequest",
+                        "X-CSRF-TOKEN": $('input[name="_token"]').val()
+                    },
+                    method: 'post',
+                    credentials: "same-origin",
+                    body: JSON.stringify({
+                        foodId: foodId,
+                        qty: inputValue,
+                        bookingId: bookingId,
+                        salonId: salonId,
+                    })
                 })
-            })
-                .then((response) => {
-                    if (response.status === 200) {
-                        if (inputValue > 0) {
-                            $('#foodName-' + elementId).css({"color": "#ff4501", "font-weight": "900"})
-                        } else {
-                            $('#foodName-' + elementId).css({"color": "", "font-weight": "500"})
+                    .then((response) => {
+                        if (response.status === 200) {
+                            if (inputValue > 0) {
+                                $('#foodName-' + elementId).css({"color": "#ff4501", "font-weight": "900"})
+                            } else {
+                                $('#foodName-' + elementId).css({"color": "", "font-weight": "500"})
+                            }
+                            Swal.fire({
+                                position: 'top-end',
+                                icon: 'success',
+                                title: '',
+                                showConfirmButton: false,
+                                timer: 1000
+                            })
                         }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
                         Swal.fire({
                             position: 'top-end',
-                            icon: 'success',
+                            icon: 'error',
                             title: '',
                             showConfirmButton: false,
                             timer: 1000
                         })
-                    }
-                })
-                .catch(function (error) {
-                    console.log(error);
-                    Swal.fire({
-                        position: 'top-end',
-                        icon: 'error',
-                        title: '',
-                        showConfirmButton: false,
-                        timer: 1000
-                    })
-                });
+                    });
+            }
         }
 
         function salonChanged(bookingId) {
