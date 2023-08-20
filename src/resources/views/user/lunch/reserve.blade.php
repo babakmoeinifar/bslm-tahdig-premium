@@ -184,7 +184,7 @@
 @push('js')
     <script src="{{ asset('js/input-spinner.js') }}"></script>
     <script>
-        $("input[type='number']").inputSpinner();
+        $("input[type='number']").inputSpinner({buttonsOnly: true, autoInterval: undefined});
 
         function updateFoodValue(foodId, elementId, qty, bookingId) {
             let inputValue = $('#' + elementId).val();
