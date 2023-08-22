@@ -105,13 +105,6 @@ class LunchController extends Controller
         $booking->foods()->attach($request->get('food_6'), ['for_inter' => $request->has('food_inter_6')]);
         $booking->foods()->attach($request->get('food_7'), ['for_inter' => $request->has('food_inter_7')]);
         $booking->foods()->attach($request->get('food_8'), ['for_inter' => $request->has('food_inter_8')]);
-        $booking->foods()->attach($request->get('food_9'), ['for_inter' => $request->has('food_inter_9')]);
-        $booking->foods()->attach($request->get('food_10'), ['for_inter' => $request->has('food_inter_10')]);
-        $booking->foods()->attach($request->get('food_11'), ['for_inter' => $request->has('food_inter_11')]);
-        $booking->foods()->attach($request->get('food_12'), ['for_inter' => $request->has('food_inter_12')]);
-        $booking->foods()->attach($request->get('food_13'), ['for_inter' => $request->has('food_inter_13')]);
-        $booking->foods()->attach($request->get('food_14'), ['for_inter' => $request->has('food_inter_14')]);
-        $booking->foods()->attach($request->get('food_15'), ['for_inter' => $request->has('food_inter_15')]);
 
         return redirect()->back()->with('msg-ok', __('msg.change_ok'));
     }
