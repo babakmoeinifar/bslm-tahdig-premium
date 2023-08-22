@@ -69,13 +69,20 @@
                                                             <div class="row">
 
                                                                 <div class="col-6">
-                                                                    <input type="number"
-                                                                           class="form-control form-control-sm"
+                                                                    <div class="input-group input-group-sm">
+                                                                        <button class="btn btn-outline-secondary btn-increment" type="button" style="min-width: 2.5rem">+</button>
+
+                                                                    <input type="text"
+                                                                           class="form-control form-control-sm text-center reserve-input"
                                                                            name="booking[{{ $booking->id }}][ {{ $food->id }}]"
-                                                                           min="0" max="3"
+                                                                           min="0" max="3" readonly
+                                                                           data-food-id="{{ $food->id }}"
+                                                                           data-booking-id="{{ $booking->id }}"
+                                                                           data-element-id="{{ $booking->id }}{{ $food->id }}"
                                                                            value="{{ $value->quantity ?? 0 }}"
-                                                                           id="{{ $booking->id }}{{ $food->id }}"
-                                                                           onchange="updateFoodValue({{ $food->id }}, {{ $booking->id }}{{ $food->id }}, {{ $value->quantity ?? 0 }}, {{ $booking->id }})">
+                                                                    >
+                                                                        <button class="btn btn-outline-secondary btn-decrement" type="button" style="min-width: 2.5rem">-</button>
+                                                                    </div>
                                                                 </div>
                                                                 <div class="col-6"
                                                                      style="align-self: center;text-align: end">
@@ -132,10 +139,6 @@
 
 @push('css')
     <style>
-        .input-group.input-group-sm {
-            direction: ltr;
-        }
-
         .nav-tabs {
             position: relative;
         }
@@ -182,62 +185,8 @@
     </style>
 @endpush
 @push('js')
-    <script src="{{ asset('js/input-spinner.js') }}"></script>
     <script>
-        $("input[type='number']").inputSpinner({buttonsOnly: true, autoInterval: undefined});
 
-        function updateFoodValue(foodId, elementId, qty, bookingId) {
-            let inputValue = $('#' + elementId).val();
-            let salonId = $('#salonId-' + bookingId).val();
-
-            if (!salonId) {
-                notification('خطا! ', 'ساختمان انتخاب شود')
-            } else {
-
-                fetch('/lunch/reserve', {
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Accept": "application/json, text-plain, */*",
-                        "X-Requested-With": "XMLHttpRequest",
-                        "X-CSRF-TOKEN": $('input[name="_token"]').val()
-                    },
-                    method: 'post',
-                    credentials: "same-origin",
-                    body: JSON.stringify({
-                        foodId: foodId,
-                        qty: inputValue,
-                        bookingId: bookingId,
-                        salonId: salonId,
-                    })
-                })
-                    .then((response) => {
-                        if (response.status === 200) {
-                            if (inputValue > 0) {
-                                $('#foodName-' + elementId).css({"color": "#ff4501", "font-weight": "900"})
-                            } else {
-                                $('#foodName-' + elementId).css({"color": "", "font-weight": "500"})
-                            }
-                            Swal.fire({
-                                position: 'top-end',
-                                icon: 'success',
-                                title: '',
-                                showConfirmButton: false,
-                                timer: 1000
-                            })
-                        }
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                        Swal.fire({
-                            position: 'top-end',
-                            icon: 'error',
-                            title: '',
-                            showConfirmButton: false,
-                            timer: 1000
-                        })
-                    });
-            }
-        }
 
         function salonChanged(bookingId) {
             let salonId = $('#salonId-' + bookingId).val();
@@ -297,6 +246,102 @@
             });
         });
 
+        (function (d) {
+            function reserve($inputEl) {
+                this.$inputEl = $inputEl;
+                this.foodId = this.$inputEl.dataset.foodId;
+                this.elementId = $inputEl.dataset.elementId;
+                this.bookingId = this.$inputEl.dataset.bookingId;
+
+                if (!this.foodId || !this.bookingId) return;
+
+                this.$inputEl.parentElement
+                    .querySelector("button.btn-increment")
+                    .addEventListener("click", this.changeValue.bind(this, "increment"));
+
+                this.$inputEl.parentElement
+                    .querySelector("button.btn-decrement")
+                    .addEventListener("click", this.changeValue.bind(this, "decrement"));
+            }
+
+            reserve.prototype.changeValue = function (type) {
+                if (this.$inputEl.disabled) return;
+
+                var oldValue = parseInt(this.$inputEl.value);
+                var newValue = type === "increment" ? oldValue + 1 : oldValue - 1;
+
+                if (newValue > parseInt(this.$inputEl.max) || newValue < parseInt(this.$inputEl.min)) return;
+
+                this.$inputEl.value = newValue;
+                this.$inputEl.disabled = true;
+
+                this.request()
+                    .then(
+                        function (response) {
+                            if (response.status === 200) {
+                                var $nameEl = d.querySelector(`#foodName-${this.elementId}`);
+                                if (this.$inputEl.value > 0) {
+                                    $nameEl.style.color = "#ff4501";
+                                    $nameEl.style.fontWeight = "900";
+                                } else {
+                                    $nameEl.style.color = "";
+                                    $nameEl.style.fontWeight = "500";
+                                }
+                                Swal.fire({
+                                    position: "top-end",
+                                    icon: "success",
+                                    title: "",
+                                    showConfirmButton: false,
+                                    timer: 1000,
+                                });
+                            }
+                        }.bind(this)
+                    )
+                    .catch(
+                        function (error) {
+                            console.log(error);
+                            this.$inputEl.value = oldValue;
+                            Swal.fire({
+                                position: "top-end",
+                                icon: "error",
+                                title: "",
+                                showConfirmButton: false,
+                                timer: 1000,
+                            });
+                        }.bind(this)
+                    )
+                    .finally(
+                        function () {
+                            this.$inputEl.disabled = false;
+                        }.bind(this)
+                    );
+            };
+
+            reserve.prototype.request = function () {
+                var salonId = d.querySelector(`#salonId-${this.bookingId}`).value;
+
+                return fetch("/lunch/reserve", {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Accept: "application/json, text-plain, */*",
+                        "X-Requested-With": "XMLHttpRequest",
+                        "X-CSRF-TOKEN": d.querySelector('input[name="_token"]').value,
+                    },
+                    method: "post",
+                    credentials: "same-origin",
+                    body: JSON.stringify({
+                        foodId: this.foodId,
+                        qty: this.$inputEl.value,
+                        bookingId: this.bookingId,
+                        salonId: salonId,
+                    }),
+                });
+            };
+
+            d.querySelectorAll("input.reserve-input").forEach(function ($inputEl) {
+                new reserve($inputEl);
+            });
+        })(document);
 
     </script>
 @endpush
