@@ -78,10 +78,11 @@
                             <th scope="col">تاریخ</th>
                             <th scope="col">وعده</th>
                             <th scope="col">غذا</th>
-                            <th scope="col">تعداد</th>
                             <th scope="col">سالن</th>
                             <th scope="col">رستوران</th>
+                            <th scope="col">تعداد</th>
                             <th scope="col">قیمت(ریال)</th>
+                            <th scope="col">قیمت کل(ریال)</th>
                             <th scope="col">عملیات</th>
                         </tr>
                         </thead>
@@ -97,10 +98,11 @@
                                         <i class="bi bi-bandaid text-muted" title="رزرو توسط سازمان"></i>
                                     @endif
                                 </td>
-                                <td>{{ $reservation->quantity }}</td>
                                 <td>{{ @$reservation->salon->name }}</td>
                                 <td>{{ @$reservation->food->restaurant->name }}</td>
+                                <td>{{ $reservation->quantity }}</td>
                                 <td>{{ number_format($reservation->price*10) }}</td>
+                                <td>{{ number_format($reservation->price*10 * $reservation->quantity) }}</td>
                                 <td>
                                     @if($reservation->date > now()->addHours(config('nahar.gap_hour'))->startOfDay())
                                         <a href="{{ url('/lunch/reserve/'.$reservation->id.'/delete')}}"
