@@ -38,7 +38,8 @@
                         </thead>
                         <tbody>
                         @foreach($reservations as $reservation)
-                            <tr @if(!@$reservation->food->name) style='background:#f1faee' @endif>
+                            <tr @if(!@$reservation->food->name) style='background:#f1faee' @endif
+                            @if($reservation->date == today()) style='background:#cff4fc' @endif>
                                 <td>{{ jdfw($reservation->date) }}</td>
                                 <td>{{ @$reservation->booking->meal->name }}</td>
                                 <td>
